@@ -30,17 +30,23 @@ export default function NoteForm({ onClose }: NoteFormProps) {
     values: NoteFormValues,
     actions: FormikHelpers<NoteFormValues>,
   ) => {
-    mutate({
-      title: values.title,
-      content: values.content,
-      tag: values.tag,
-    });
-    actions.resetForm();
+    mutate(
+      {
+        title: values.title,
+        content: values.content,
+        tag: values.tag,
+      },
+      {
+        onSuccess: () => {
+          actions.resetForm();
+        },
+      },
+    );
   };
 
   const NoteFormSchema = Yup.object().shape({
     title: Yup.string()
-      .min(3, "Title is too short (minimum 2 characters).")
+      .min(3, "Title is too short (minimum 3 characters).")
       .max(50, "Title is too long (maximum 50 characters).")
       .required("Title is required"),
     content: Yup.string().max(

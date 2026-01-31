@@ -18,7 +18,7 @@ export default function NoteList({ notes }: NoteListProps) {
       toast.success("Note deleted");
     },
     onError() {
-      toast.error("Failed to delete note");
+      toast.error("Failed to create note");
     },
   });
 
