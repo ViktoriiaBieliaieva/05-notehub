@@ -3,20 +3,21 @@ import { useState } from "react";
 import { fetchNotes } from "../../services/noteService";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useDebouncedCallback } from "use-debounce";
+import { Toaster } from "react-hot-toast";
 import Pagination from "../Pagination/Pagination";
 import SearchBox from "../SearchBox/SearchBox";
 import Modal from "../Modal/Modal";
 import NoteForm from "../NoteForm/NoteForm";
 import NoteList from "../NoteList/NoteList";
 import Loader from "../Loader/Loader";
-import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import toast from "react-hot-toast";
 
 export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data, isLoading, isFetching, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ["notes", searchQuery, page],
     queryFn: () => fetchNotes(searchQuery, page),
     placeholderData: keepPreviousData,
@@ -32,6 +33,7 @@ export default function App() {
 
   return (
     <div className={css.app}>
+      <Toaster position="top-right" />
       <header className={css.toolbar}>
         <SearchBox onUpdate={updateSearchQuery} />
         {data && data.totalPages > 1 && (
@@ -50,14 +52,11 @@ export default function App() {
           </Modal>
         )}
       </header>
-
       {isLoading && <Loader />}
 
-      {isError && <ErrorMessage />}
+      {isError && toast.error("There was an error, please try again...")}
 
       {data && data.notes.length > 0 && <NoteList notes={data.notes} />}
-
-      {isFetching && !isLoading && <Loader />}
     </div>
   );
 }

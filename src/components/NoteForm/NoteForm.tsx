@@ -5,8 +5,7 @@ import { ErrorMessage, Field, Form, Formik, type FormikHelpers } from "formik";
 import { useId } from "react";
 import * as Yup from "yup";
 import { type NoteTag } from "../../types/note";
-import { useState } from "react";
-import SuccessMessage from "../SuccessMessage/SuccessMessage";
+import toast from "react-hot-toast";
 
 interface NoteFormProps {
   onClose: () => void;
@@ -37,7 +36,6 @@ export default function NoteForm({ onClose }: NoteFormProps) {
       tag: values.tag,
     });
     actions.resetForm();
-    // onClose();
   };
 
   const NoteFormSchema = Yup.object().shape({
@@ -56,24 +54,15 @@ export default function NoteForm({ onClose }: NoteFormProps) {
 
   const queryClient = useQueryClient();
 
-  const [success, setSuccess] = useState(false);
-
   const { mutate } = useMutation({
     mutationFn: createNote,
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-      setSuccess(true);
-
-      setTimeout(() => {
-        setSuccess(false);
-        onClose();
-      }, 1500);
+      toast.success("Note created");
+      onClose();
     },
-    // onSuccess() {
-    //   queryClient.invalidateQueries({ queryKey: ["notes"] });
-    // },
     onError() {
-      console.log("error");
+      toast.error("Failed to create note");
     },
   });
 
@@ -84,8 +73,6 @@ export default function NoteForm({ onClose }: NoteFormProps) {
       onSubmit={handleSubmit}
     >
       <Form className={css.form}>
-        {success && <SuccessMessage>Note created successfully</SuccessMessage>}
-
         <div className={css.formGroup}>
           <label htmlFor={`${fieldId}-title`}>Title</label>
           <Field
